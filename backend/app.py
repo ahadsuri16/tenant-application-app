@@ -7,6 +7,7 @@ import re
 import os
 import base64
 
+from utils.pdf_generator import generate_tenant_pdf
 from utils.email_sender import send_tenant_email
 
 app = FastAPI(title="Tenant Application API")
@@ -94,8 +95,11 @@ async def submit_application(payload: ApplicationData):
                 raise HTTPException(status_code=400, detail="CNIC image must be less than 5MB.")
             cnic_filename = payload.cnic_filename
 
-        # 4. Send Email (Rich HTML instead of PDF)
-        success = send_tenant_email(data, cnic_content, cnic_filename)
+        # 4. Generate PDF
+        pdf_buffer = generate_tenant_pdf(data, cnic_content)
+        
+        # 5. Send Email
+        success = send_tenant_email(pdf_buffer, payload.fullName, cnic_content, cnic_filename)
         
         if success:
             return {"status": "success", "message": "Application submitted successfully."}
