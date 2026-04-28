@@ -7,8 +7,8 @@ import re
 import os
 import base64
 
-from utils.pdf_generator import generate_tenant_pdf
-from utils.email_sender import send_tenant_email
+from _utils.pdf_generator import generate_tenant_pdf
+from _utils.email_sender import send_tenant_email
 
 app = FastAPI(title="Tenant Application API")
 
@@ -63,7 +63,7 @@ class ApplicationData(BaseModel):
     cnic_base64: str = None
     cnic_filename: str = None
 
-@app.post("/submit")
+@app.post("/api/submit")
 async def submit_application(payload: ApplicationData):
     try:
         # 1. Validation
@@ -112,15 +112,3 @@ async def submit_application(payload: ApplicationData):
         print(f"Server Error: {e}")
         raise HTTPException(status_code=500, detail=f"An error occurred while processing your application.")
 
-# Mount frontend directory for easy deployment
-frontend_path = os.path.join(os.path.dirname(__file__), "..")
-
-@app.get("/")
-def serve_index():
-    return FileResponse(os.path.join(frontend_path, "index.html"))
-
-@app.get("/style.css")
-def serve_css():
-    return FileResponse(os.path.join(frontend_path, "style.css"))
-
-# Run with: uvicorn app:app --reload
