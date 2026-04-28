@@ -1,180 +1,127 @@
+from fpdf import FPDF
 import io
+import base64
 from datetime import datetime
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle, Image
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+
+class TenantPDF(FPDF):
+    def header(self):
+        self.set_fill_color(16, 185, 129)  # emerald green
+        self.rect(0, 0, 210, 22, 'F')
+        self.set_font('Helvetica', 'B', 16)
+        self.set_text_color(255, 255, 255)
+        self.set_y(5)
+        self.cell(0, 12, 'Tenant Application Form', align='C')
+        self.set_text_color(0, 0, 0)
+        self.ln(18)
+
+    def footer(self):
+        self.set_y(-15)
+        self.set_font('Helvetica', 'I', 8)
+        self.set_text_color(150, 150, 150)
+        self.cell(0, 10, f'Generated on {datetime.now().strftime("%d %B %Y at %H:%M")}  |  Page {self.page_no()}', align='C')
+
+def section_title(pdf, title):
+    pdf.set_fill_color(240, 253, 250)
+    pdf.set_draw_color(16, 185, 129)
+    pdf.set_font('Helvetica', 'B', 11)
+    pdf.set_text_color(5, 150, 105)
+    pdf.cell(0, 9, f'  {title}', border='LB', fill=True, ln=True)
+    pdf.set_text_color(0, 0, 0)
+    pdf.ln(2)
+
+def data_row(pdf, label, value):
+    if not value:
+        return
+    pdf.set_font('Helvetica', 'B', 9)
+    pdf.set_fill_color(248, 250, 252)
+    pdf.cell(65, 8, label, border=1, fill=True)
+    pdf.set_font('Helvetica', '', 9)
+    pdf.set_fill_color(255, 255, 255)
+    pdf.cell(125, 8, str(value), border=1, fill=True, ln=True)
 
 def generate_tenant_pdf(data: dict, cnic_content: bytes = None) -> io.BytesIO:
-    """
-    Generates a professional PDF for the Tenant Application.
-    Returns a BytesIO object containing the PDF.
-    """
-    buffer = io.BytesIO()
-    doc = SimpleDocTemplate(
-        buffer,
-        pagesize=letter,
-        rightMargin=40,
-        leftMargin=40,
-        topMargin=40,
-        bottomMargin=40
-    )
-    
-    styles = getSampleStyleSheet()
-    
-    # Custom Styles
-    title_style = ParagraphStyle(
-        'TitleStyle',
-        parent=styles['Heading1'],
-        fontSize=26,
-        textColor=colors.HexColor("#0f172a"),
-        spaceAfter=5,
-        alignment=1, # Center
-        fontName='Helvetica-Bold'
-    )
-    
-    subtitle_style = ParagraphStyle(
-        'SubtitleStyle',
-        parent=styles['Normal'],
-        fontSize=10,
-        textColor=colors.HexColor("#64748b"),
-        spaceAfter=30,
-        alignment=1
-    )
-    
-    heading_style = ParagraphStyle(
-        'HeadingStyle',
-        parent=styles['Heading2'],
-        fontSize=12,
-        textColor=colors.HexColor("#ffffff"),
-        backColor=colors.HexColor("#334155"),
-        spaceAfter=15,
-        spaceBefore=25,
-        borderPadding=(6, 10, 6, 10),
-        fontName='Helvetica-Bold'
-    )
-    
-    normal_style = styles['Normal']
-    normal_style.fontSize = 10
-    normal_style.leading = 14
-    
-    bold_style = ParagraphStyle(
-        'BoldStyle',
-        parent=normal_style,
-        fontName='Helvetica-Bold'
-    )
+    pdf = TenantPDF()
+    pdf.set_auto_page_break(auto=True, margin=20)
+    pdf.add_page()
+    pdf.set_margins(12, 28, 12)
 
-    story = []
-    
-    # Title Block
-    story.append(Paragraph("OFFICIAL RENTAL APPLICATION", title_style))
-    story.append(Paragraph(f"Application ID: {datetime.now().strftime('%Y%m%d%H%M')} | Submitted: {datetime.now().strftime('%B %d, %Y %I:%M %p')}", subtitle_style))
-    
-    def add_section(title, fields):
-        story.append(Paragraph(title.upper(), heading_style))
-        data_table = []
-        for key, val in fields.items():
-            if not val:
-                val = "N/A"
-            clean_key = Paragraph(f"<b>{key}</b>", normal_style)
-            clean_val = Paragraph(str(val), normal_style)
-            data_table.append([clean_key, clean_val])
-            
-        t = Table(data_table, colWidths=[180, 340])
-        t.setStyle(TableStyle([
-            ('VALIGN', (0,0), (-1,-1), 'MIDDLE'),
-            ('BOTTOMPADDING', (0,0), (-1,-1), 8),
-            ('TOPPADDING', (0,0), (-1,-1), 8),
-            ('LEFTPADDING', (0,0), (-1,-1), 10),
-            ('RIGHTPADDING', (0,0), (-1,-1), 10),
-            ('GRID', (0,0), (-1,-1), 0.5, colors.HexColor("#cbd5e1")),
-            ('BACKGROUND', (0,0), (0,-1), colors.HexColor("#f8fafc")),
-        ]))
-        story.append(t)
+    # --- Personal Information ---
+    section_title(pdf, 'Personal Information')
+    data_row(pdf, 'Full Name', data.get('fullName'))
+    data_row(pdf, 'Phone Number', data.get('phone'))
+    data_row(pdf, 'Current Address', data.get('address'))
+    pdf.ln(4)
 
-    # Basic Info
-    add_section("Personal Information", {
-        "Full Name": data.get("fullName"),
-        "Phone Number": data.get("phone"),
-        "Permanent Address": data.get("address")
-    })
-    
-    # Tenant Details
-    add_section("Tenant Details", {
-        "Occupants & Relation": data.get("peopleDetails"),
-        "Has Pets?": data.get("hasPets", "No").title(),
-        "Pet Details": data.get("petDetails") if data.get("hasPets") == "yes" else None
-    })
-    
-    # Employment / Income
-    occ = data.get("occupation", "").title()
-    emp_details = {}
-    emp_details["Occupation Status"] = occ
-    
-    if occ.lower() == "job":
-        emp_details["Company Name"] = data.get("company")
-        emp_details["Job Type"] = data.get("jobType", "").title()
-    elif occ.lower() == "business":
-        emp_details["Business Info"] = data.get("businessInfo")
-    elif occ.lower() == "student":
-        emp_details["Institute"] = data.get("institute")
-        emp_details["Has Other Income?"] = data.get("studentIncome", "No").title()
-        if data.get("studentIncome") == "yes":
-            emp_details["Income Source"] = data.get("incomeSourceDetails")
+    # --- Tenant Details ---
+    section_title(pdf, 'Tenant Details')
+    data_row(pdf, 'People Moving In', data.get('peopleDetails'))
+    data_row(pdf, 'Has Pets', data.get('hasPets'))
+    data_row(pdf, 'Pet Details', data.get('petDetails'))
+    pdf.ln(4)
 
-    # Add shared income fields unless strictly a student with no income
-    if data.get("income"):
-        emp_details["Monthly Income Range"] = data.get("income").replace("_", " ").title()
-    if data.get("employmentDuration"):
-        emp_details["Employment Duration"] = data.get("employmentDuration")
-        
-    add_section("Employment & Income", emp_details)
-    
-    # Preferences
-    add_section("Rental Preferences", {
-        "Desired Move-In Date": data.get("moveInDate"),
-        "Planned Stay Duration": data.get("stayDuration"),
-        "Preferred Rent Range": data.get("rentRange"),
-        "Can Pay Security Deposit?": data.get("securityDeposit", "Yes").title()
-    })
-    
-    # History
-    add_section("Rental History", {
-        "Has Rented Before?": data.get("rentedBefore", "No").title(),
-        "Previous Landlord Contact": data.get("previousLandlord") if data.get("rentedBefore") == "yes" else None,
-        "Reason for Leaving": data.get("reasonForLeaving") if data.get("rentedBefore") == "yes" else None
-    })
-    
-    # Rules
-    add_section("Rules & Eligibility", {
-        "Agreed to pay on/before 10th": "Yes",
-        "No criminal history": "Yes",
-        "Residential use only": "Yes",
-        "Maintain peaceful environment": "Yes",
-        "Follow house rules": "Yes",
-        "Information is accurate": "Yes",
-    })
-    
-    # CNIC Image
+    # --- Employment ---
+    section_title(pdf, 'Employment & Income')
+    data_row(pdf, 'Occupation', data.get('occupation'))
+    data_row(pdf, 'Company / Employer', data.get('company'))
+    data_row(pdf, 'Job Type', data.get('jobType'))
+    data_row(pdf, 'Business Info', data.get('businessInfo'))
+    data_row(pdf, 'Institute / University', data.get('institute'))
+    data_row(pdf, 'Student Income Source', data.get('studentIncome'))
+    data_row(pdf, 'Income Source Details', data.get('incomeSourceDetails'))
+    data_row(pdf, 'Monthly Income (PKR)', data.get('income'))
+    data_row(pdf, 'Employment Duration', data.get('employmentDuration'))
+    pdf.ln(4)
+
+    # --- Preferences ---
+    section_title(pdf, 'Rental Preferences')
+    data_row(pdf, 'Preferred Move-in Date', data.get('moveInDate'))
+    data_row(pdf, 'Intended Stay Duration', data.get('stayDuration'))
+    data_row(pdf, 'Rent Budget (PKR)', data.get('rentRange'))
+    data_row(pdf, 'Security Deposit', data.get('securityDeposit'))
+    pdf.ln(4)
+
+    # --- Rental History ---
+    section_title(pdf, 'Rental History')
+    data_row(pdf, 'Rented Before?', data.get('rentedBefore'))
+    data_row(pdf, 'Previous Landlord', data.get('previousLandlord'))
+    data_row(pdf, 'Reason for Leaving', data.get('reasonForLeaving'))
+    data_row(pdf, 'Legal Issues?', data.get('legalIssues'))
+    pdf.ln(4)
+
+    # --- Eligibility ---
+    section_title(pdf, 'Eligibility Agreement')
+    rules = [
+        ('rule1', 'No subletting without permission'),
+        ('rule2', 'No illegal activities'),
+        ('rule3', 'No structural changes'),
+        ('rule4', 'Maintain cleanliness'),
+        ('rule5', 'Timely rent payment'),
+        ('rule6', 'No loud noise / disturbances'),
+    ]
+    for key, label in rules:
+        val = 'Agreed' if data.get(key) else 'Not Agreed'
+        data_row(pdf, label, val)
+    pdf.ln(4)
+
+    # --- CNIC Image ---
     if cnic_content:
-        story.append(Spacer(1, 10))
-        story.append(Paragraph("CNIC / IDENTIFICATION", heading_style))
+        pdf.add_page()
+        section_title(pdf, 'CNIC / ID Image')
+        pdf.ln(4)
         try:
-            img = Image(io.BytesIO(cnic_content))
-            # Scale image proportionally to fit page width roughly
-            aspect = img.imageHeight / float(img.imageWidth)
-            img.drawWidth = 400
-            img.drawHeight = 400 * aspect
-            img.hAlign = 'CENTER'
-            story.append(img)
+            import tempfile, os
+            suffix = '.jpg'
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                tmp.write(cnic_content)
+                tmp_path = tmp.name
+            pdf.image(tmp_path, x=12, w=186)
+            os.unlink(tmp_path)
         except Exception as e:
-            story.append(Paragraph("<i>[Image provided but could not be rendered in PDF. It may be an unsupported format.]</i>", normal_style))
-    
-    # Footer Notice
-    story.append(Spacer(1, 30))
-    story.append(Paragraph("<i>This document is automatically generated from a secure web form submission.</i>", ParagraphStyle('Footer', parent=normal_style, alignment=1, fontSize=9, textColor=colors.gray)))
-    
-    # Build
-    doc.build(story)
+            pdf.set_font('Helvetica', 'I', 10)
+            pdf.cell(0, 10, f'[CNIC image could not be embedded: {e}]', ln=True)
+
+    buffer = io.BytesIO()
+    pdf_bytes = pdf.output()
+    buffer.write(pdf_bytes)
     buffer.seek(0)
     return buffer
