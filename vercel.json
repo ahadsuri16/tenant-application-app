@@ -1,8 +1,21 @@
 {
-  "rewrites": [
+  "builds": [
     {
-      "source": "/submit",
-      "destination": "/api/app.py"
+      "src": "backend/app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "style.css",
+      "use": "@vercel/static"
     }
+  ],
+  "routes": [
+    { "src": "/submit", "dest": "/backend/app.py" },
+    { "src": "/style.css", "dest": "/style.css" },
+    { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
