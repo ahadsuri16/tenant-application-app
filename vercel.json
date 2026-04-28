@@ -13,9 +13,18 @@
       "use": "@vercel/static"
     }
   ],
-  "routes": [
-    { "src": "/submit", "dest": "/backend/app.py" },
-    { "src": "/style.css", "dest": "/style.css" },
-    { "src": "/(.*)", "dest": "/index.html" }
+  "rewrites": [
+    {
+      "source": "/submit",
+      "destination": "/backend/app.py"
+    },
+    {
+      "source": "/style.css",
+      "destination": "/style.css"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
   ]
 }
