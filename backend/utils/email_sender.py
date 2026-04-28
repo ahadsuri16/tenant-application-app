@@ -1,68 +1,45 @@
 import os
-import smtplib
-from email.message import EmailMessage
 import io
+import resend
 
 def send_tenant_email(pdf_buffer: io.BytesIO, applicant_name: str, cnic_content: bytes = None, cnic_filename: str = None):
     """
-    Sends an email to the property manager with the PDF and CNIC attached.
+    Sends an email to the property manager with the PDF and CNIC attached using Resend HTTP API.
     """
-    email_user = os.environ.get('EMAIL_USER')
-    email_pass = os.environ.get('EMAIL_PASS')
+    resend.api_key = os.environ.get('RESEND_API_KEY')
     recipient = "ahadsuri804@gmail.com"
     
-    if not email_user or not email_pass:
-        print("Warning: EMAIL_USER or EMAIL_PASS not set. Email will not be sent.")
+    if not resend.api_key:
+        print("Warning: RESEND_API_KEY not set. Email will not be sent.")
         return False
         
-    msg = EmailMessage()
-    msg['Subject'] = f"New Tenant Application: {applicant_name}"
-    msg['From'] = email_user
-    msg['To'] = recipient
-    
-    body = f"""
-    Hello,
-    
-    A new tenant application has been submitted by {applicant_name}.
-    
-    Please find the structured application attached as a PDF.
-    """
-    
-    if cnic_filename:
-        body += "\nThe applicant's CNIC image is also attached to this email."
-        
-    msg.set_content(body)
-    
-    # Attach PDF
     pdf_buffer.seek(0)
-    msg.add_attachment(
-        pdf_buffer.read(),
-        maintype='application',
-        subtype='pdf',
-        filename=f"Tenant_Application_{applicant_name.replace(' ', '_')}.pdf"
-    )
+    pdf_bytes = pdf_buffer.read()
     
-    # Attach CNIC if exists
+    attachments = [
+        {
+            "filename": f"Tenant_Application_{applicant_name.replace(' ', '_')}.pdf",
+            "content": list(pdf_bytes)
+        }
+    ]
+    
     if cnic_content and cnic_filename:
-        # Determine subtype roughly from filename or default to octet-stream
-        ext = cnic_filename.split('.')[-1].lower()
-        subtype = 'jpeg' if ext in ['jpg', 'jpeg'] else 'png' if ext == 'png' else 'octet-stream'
-        maintype = 'image' if subtype in ['jpeg', 'png'] else 'application'
+        attachments.append({
+            "filename": f"CNIC_{applicant_name.replace(' ', '_')}_{cnic_filename}",
+            "content": list(cnic_content)
+        })
         
-        msg.add_attachment(
-            cnic_content,
-            maintype=maintype,
-            subtype=subtype,
-            filename=f"CNIC_{applicant_name.replace(' ', '_')}.{ext}"
-        )
-        
-    # Send email
+    params = {
+        "from": "onboarding@resend.dev",
+        "to": [recipient],
+        "subject": f"New Tenant Application: {applicant_name}",
+        "html": f"<p>A new tenant application has been submitted by <b>{applicant_name}</b>.</p><p>Please find the structured application and CNIC attached to this email.</p>",
+        "attachments": attachments
+    }
+    
     try:
-        # Use SMTP_SSL for port 465
-        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-            smtp.login(email_user, email_pass)
-            smtp.send_message(msg)
+        email = resend.Emails.send(params)
         return True
     except Exception as e:
-        print(f"Error sending email: {str(e)}")
+        print(f"Error sending email via Resend: {str(e)}")
         raise e
