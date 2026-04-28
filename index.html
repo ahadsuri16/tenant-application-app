@@ -428,11 +428,15 @@
             btn.disabled = true;
 
             const formData = new FormData(this);
+            const dataObj = Object.fromEntries(formData.entries());
 
-            fetch('/submit', {
-                method: 'POST',
-                body: formData
-            })
+            // Function to send JSON
+            const sendJsonData = (jsonData) => {
+                fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(jsonData)
+                })
                 .then(response => response.json().then(data => ({ status: response.status, body: data })))
                 .then(({ status, body }) => {
                     if (status === 200 && (body.status === 'success' || body.status === 'warning')) {
@@ -471,6 +475,22 @@
                     btn.style.opacity = '1';
                     btn.disabled = false;
                 });
+            };
+
+            // Process image to base64 if present
+            const fileInput = document.getElementById('cnic');
+            if (fileInput.files.length > 0) {
+                const file = fileInput.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    dataObj.cnic_base64 = event.target.result;
+                    dataObj.cnic_filename = file.name;
+                    sendJsonData(dataObj);
+                };
+                reader.readAsDataURL(file);
+            } else {
+                sendJsonData(dataObj);
+            }
         });
 
         // Add file upload UI interaction
