@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Tenant Application</title>
+    <meta name="description" content="Secure and comprehensive tenant application form.">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+    </div>
+
+    <div class="container">
+        <header class="form-header">
+            <h1>Tenant Application Form <span dir="rtl" class="urdu-text">(کرایہ دار کی درخواست کا فارم)</span></h1>
+            <p>Please fill out the details below to complete your application. <span dir="rtl" class="urdu-text">(براہ
+                    کرم اپنی درخواست مکمل کرنے کے لیے نیچے دی گئی تفصیلات پُر کریں۔)</span></p>
+        </header>
+
+        <form id="tenantForm" class="glass-form">
+
+            <!-- Section: Personal Information -->
+            <section class="form-section">
+                <h2><span class="icon">👤</span> Personal Information of Family Head <span dir="rtl"
+                        class="urdu-text">(خاندان کے سربراہ کی ذاتی معلومات)</span></h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullName">Full Name <span dir="rtl" class="urdu-text">(مکمل نام)</span></label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Ali (علی)" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Phone Number <span dir="rtl" class="urdu-text">(فون نمبر)</span></label>
+                        <input type="tel" id="phone" name="phone" placeholder="+92 300 0000000" required>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="cnic">Upload CNIC Picture <span dir="rtl" class="urdu-text">(شناختی کارڈ کی تصویر اپ
+                                لوڈ کریں)</span></label>
+                        <div class="file-upload-wrapper">
+                            <input type="file" id="cnic" name="cnic" accept="image/*" required>
+                            <div class="file-upload-ui" id="uploadUI">
+                                <span class="upload-icon">📄</span>
+                                <span class="upload-text">Select and upload your cnic front image here <span dir="rtl" class="urdu-text">(اپنے شناختی کارڈ کے سامنے کی تصویر یہاں منتخب کر کے اپ لوڈ کریں)</span></span>
+                            </div>
+                            <!-- Image Preview Container -->
+                            <div id="imagePreviewContainer" class="hidden" style="margin-top: 1rem; text-align: center; background: rgba(255, 255, 255, 0.4); border-radius: 8px; padding: 1rem;">
+                                <img id="cnicPreview" src="" alt="CNIC Preview" style="max-width: 100%; max-height: 250px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                                <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+                                    <button type="button" onclick="document.getElementById('cnic').click()" style="background: var(--primary-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
+                                        Replace Image <span dir="rtl" class="urdu-text" style="display:inline; color: white;">(تبدیل کریں)</span>
+                                    </button>
+                                    <button type="button" onclick="removeImage()" style="background: #ef4444; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
+                                        Remove Image <span dir="rtl" class="urdu-text" style="display:inline; color: white;">(ہٹا دیں)</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="address">Permanent Address <span dir="rtl" class="urdu-text">(مستقل
+                                پتہ)</span></label>
+                        <textarea id="address" name="address" rows="3" placeholder="123 Main St, City, Country"
+                            required></textarea>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Tenant Details -->
+            <section class="form-section">
+                <h2><span class="icon">👨‍👩‍👧</span> Tenant Details <span dir="rtl" class="urdu-text">(کرایہ دار کی
+                        تفصیلات)</span></h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="peopleDetails">How many people will live in the house & Your relation with them?
+                            <span dir="rtl" class="urdu-text">(گھر میں کتنے افراد رہیں گے اور ان سے آپ کا کیا رشتہ
+                                ہے؟)</span></label>
+                        <textarea id="peopleDetails" name="peopleDetails" rows="3"
+                            placeholder="e.g. 3 people (Myself, Spouse, 1 Child)" required></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Any pets? <span dir="rtl" class="urdu-text">(کیا آپ کے پاس کوئی پالتو جانور
+                                ہے؟)</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="hasPets" value="yes"
+                                    onchange="toggleDetails('petDetailsWrapper', true)">
+                                <span class="radio-custom"></span> Yes (ہاں)</label>
+                            <label class="radio-label">
+                                <input type="radio" name="hasPets" value="no" checked
+                                    onchange="toggleDetails('petDetailsWrapper', false)">
+                                <span class="radio-custom"></span> No (نہیں)</label>
+                        </div>
+                    </div>
+                    <div class="form-group full-width hidden" id="petDetailsWrapper">
+                        <label for="petDetails">Pet Details <span dir="rtl" class="urdu-text">(پالتو جانور کی
+                                تفصیلات)</span></label>
+                        <input type="text" id="petDetails" name="petDetails" placeholder="Breed, weight, etc.">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Employment / Income -->
+            <section class="form-section">
+                <h2><span class="icon">💼</span> Employment / Source of Income <span dir="rtl" class="urdu-text">(روزگار
+                        / آمدنی کا ذریعہ)</span></h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="occupation">Occupation <span dir="rtl" class="urdu-text">(پیشہ)</span></label>
+                        <select id="occupation" name="occupation" required
+                            onchange="handleOccupationChange(this.value)">
+                            <option value="" disabled selected>Select occupation...</option>
+                            <option value="job">Job / Salaried (نوکری / تنخواہ دار)</option>
+                            <option value="business">Business / Self-Employed (کاروبار / ذاتی روزگار)</option>
+                            <option value="student">Student (طالب علم)</option>
+                            <option value="other">Other (دیگر)</option>
+                        </select>
+                    </div>
+
+                    <!-- Dynamic Occupation Fields -->
+                    <div id="jobDetails" class="hidden"
+                        style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="company">Company / Organization Name <span dir="rtl" class="urdu-text">(کمپنی /
+                                    ادارے کا نام)</span></label>
+                            <input type="text" id="company" name="company" placeholder="Acme Corp">
+                        </div>
+                        <div class="form-group">
+                            <label for="jobType">Job Type <span dir="rtl" class="urdu-text">(نوکری کی
+                                    قسم)</span></label>
+                            <select id="jobType" name="jobType">
+                                <option value="" disabled selected>Select type...</option>
+                                <option value="private">Private Sector (نجی شعبہ)</option>
+                                <option value="public">Public / Government (سرکاری / گورنمنٹ)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="businessDetails" class="hidden" style="grid-column: 1 / -1;">
+                        <div class="form-group">
+                            <label for="businessInfo">Business / Self-Employed Details <span dir="rtl"
+                                    class="urdu-text">(کاروبار کی تفصیلات)</span></label>
+                            <textarea id="businessInfo" name="businessInfo" rows="2"
+                                placeholder="Describe your business, industry, etc."></textarea>
+                        </div>
+                    </div>
+
+                    <div id="studentDetails" class="hidden"
+                        style="grid-column: 1 / -1; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                        <div class="form-group">
+                            <label for="institute">Institute Details <span dir="rtl" class="urdu-text">(تعلیمی ادارے کی
+                                    تفصیلات)</span></label>
+                            <input type="text" id="institute" name="institute" placeholder="University / College Name">
+                        </div>
+                        <div class="form-group">
+                            <label>Any source of income? <span dir="rtl" class="urdu-text">(کیا آمدنی کا کوئی ذریعہ
+                                    ہے؟)</span></label>
+                            <div class="radio-group">
+                                <label class="radio-label">
+                                    <input type="radio" name="studentIncome" value="yes"
+                                        onchange="toggleDetails('studentIncomeDetails', true)">
+                                    <span class="radio-custom"></span> Yes (ہاں)</label>
+                                <label class="radio-label">
+                                    <input type="radio" name="studentIncome" value="no" checked
+                                        onchange="toggleDetails('studentIncomeDetails', false)">
+                                    <span class="radio-custom"></span> No (نہیں)</label>
+                            </div>
+                        </div>
+                        <div id="studentIncomeDetails" class="hidden" style="grid-column: 1 / -1;">
+                            <div class="form-group">
+                                <label for="incomeSourceDetails">Source of Income Details <span dir="rtl"
+                                        class="urdu-text">(آمدنی کے ذریعہ کی تفصیلات)</span></label>
+                                <input type="text" id="incomeSourceDetails" name="incomeSourceDetails"
+                                    placeholder="e.g. Freelancing, Parents, Allowance...">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="income">Monthly Income (Range) <span dir="rtl" class="urdu-text">(ماہانہ آمدنی کی
+                                حد)</span></label>
+                        <select id="income" name="income" required>
+                            <option value="" disabled selected>Select range...</option>
+                            <option value="under_70k">Under 70,000</option>
+                            <option value="70k_100k">70,000 - 100,000</option>
+                            <option value="100k_150k">100,000 - 150,000</option>
+                            <option value="150k_250k">150,000 - 250,000</option>
+                            <option value="over_250k">Over 250,000</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="employmentDuration">How long working there? <span dir="rtl" class="urdu-text">(آپ کو
+                                وہاں کام کرتے ہوئے کتنا عرصہ ہو گیا ہے؟)</span></label>
+                        <input type="text" id="employmentDuration" name="employmentDuration" placeholder="e.g. 2 Years"
+                            required>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Rental Preferences -->
+            <section class="form-section">
+                <h2><span class="icon">📅</span> Rental Preferences <span dir="rtl" class="urdu-text">(کرائے کی
+                        ترجیحات)</span></h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="moveInDate">When do you want to move in? <span dir="rtl" class="urdu-text">(آپ کب
+                                منتقل ہونا چاہتے ہیں؟)</span></label>
+                        <input type="date" id="moveInDate" name="moveInDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="stayDuration">How long do you plan to stay? <span dir="rtl" class="urdu-text">(آپ کا
+                                کتنا عرصہ قیام کا ارادہ ہے؟)</span></label>
+                        <input type="text" id="stayDuration" name="stayDuration" placeholder="e.g. 1 Year, 6 Months"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="rentRange">Preferred Rent Range (Optional) <span dir="rtl" class="urdu-text">(کرائے
+                                کی ترجیحی حد (اختیاری))</span></label>
+                        <input type="text" id="rentRange" name="rentRange" placeholder="e.g. 46,000 - 50,000">
+                    </div>
+                    <div class="form-group">
+                        <label>Can you pay security deposit? <span dir="rtl" class="urdu-text">(کیا آپ سیکیورٹی ڈپازٹ
+                                ادا کر سکتے ہیں؟)</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="securityDeposit" value="yes" checked>
+                                <span class="radio-custom"></span> Yes (ہاں)</label>
+                            <label class="radio-label">
+                                <input type="radio" name="securityDeposit" value="no">
+                                <span class="radio-custom"></span> No (نہیں)</label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Rental History -->
+            <section class="form-section">
+                <h2><span class="icon">🏡</span> Rental History <span dir="rtl" class="urdu-text">(کرائے کی تاریخ /
+                        سابقہ ریکارڈ)</span></h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Have you rented before? <span dir="rtl" class="urdu-text">(کیا آپ نے پہلے کبھی کرائے پر
+                                گھر لیا ہے؟)</span></label>
+                        <div class="radio-group">
+                            <label class="radio-label">
+                                <input type="radio" name="rentedBefore" value="yes"
+                                    onchange="toggleDetails('rentalHistoryDetails', true)">
+                                <span class="radio-custom"></span> Yes (ہاں)</label>
+                            <label class="radio-label">
+                                <input type="radio" name="rentedBefore" value="no" checked
+                                    onchange="toggleDetails('rentalHistoryDetails', false)">
+                                <span class="radio-custom"></span> No (نہیں)</label>
+                        </div>
+                    </div>
+
+                    <div id="rentalHistoryDetails" class="hidden full-width" style="display: contents;">
+                        <div class="form-group">
+                            <label for="previousLandlord">Previous Landlord Contact (Optional if you have) <span
+                                    dir="rtl" class="urdu-text">(پچھلے مالک مکان کا رابطہ)</span></label>
+                            <input type="text" id="previousLandlord" name="previousLandlord"
+                                placeholder="Name & Phone/Email">
+                        </div>
+                        <div class="form-group">
+                            <label for="reasonForLeaving">Reason for leaving previous place <span dir="rtl"
+                                    class="urdu-text">(پچھلی جگہ چھوڑنے کی وجہ)</span></label>
+                            <input type="text" id="reasonForLeaving" name="reasonForLeaving"
+                                placeholder="e.g. Relocation, Size">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Rules, Regulations & Eligibility -->
+            <section class="form-section">
+                <h2><span class="icon">📜</span> Rules, Regulations & Eligibility <span dir="rtl"
+                        class="urdu-text">(قواعد، ضوابط اور اہلیت)</span></h2>
+                <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.95rem;">Please read and confirm
+                    all the following conditions: <span dir="rtl" class="urdu-text">(براہ کرم درج ذیل تمام شرائط پڑھیں
+                        اور تصدیق کریں:)</span></p>
+                <div class="form-grid" style="grid-template-columns: 1fr; gap: 1rem;">
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule1" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I confirm that I will pay the monthly rent on or before the 10th of
+                            each month. In case of delay, a late fee of PKR 50 per day will be applicable. <span
+                                dir="rtl" class="urdu-text">(میں تصدیق کرتا ہوں کہ میں ہر ماہ کی 10 تاریخ تک کرایہ ادا
+                                کروں گا۔ تاخیر کی صورت میں روزانہ 50 روپے جرمانہ عائد ہوگا۔)</span></span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule2" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I confirm that I have not been involved in any illegal or criminal
+                            activity and have no history of unlawful conduct. <span dir="rtl" class="urdu-text">(میں
+                                تصدیق کرتا ہوں کہ میں کسی غیر قانونی یا مجرمانہ سرگرمی میں ملوث نہیں رہا اور میرا کوئی
+                                غیر قانونی ریکارڈ نہیں ہے۔)</span></span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule3" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I agree to use the property only for residential purposes and will
+                            not engage in any illegal activities on the premises. <span dir="rtl" class="urdu-text">(میں
+                                اتفاق کرتا ہوں کہ میں پراپرٹی صرف رہائشی مقاصد کے لیے استعمال کروں گا اور احاطے میں کسی
+                                غیر قانونی سرگرمی میں ملوث نہیں ہوں گا۔)</span></span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule4" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I agree to respect neighbors and maintain a peaceful environment.
+                            <span dir="rtl" class="urdu-text">(میں پڑوسیوں کا احترام کرنے اور پرامن ماحول برقرار رکھنے
+                                سے اتفاق کرتا ہوں۔)</span></span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule5" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I agree to follow all house rules and terms set by the landlord.
+                            <span dir="rtl" class="urdu-text">(میں مالک مکان کی مقرر کردہ تمام شرائط اور قواعد پر عمل
+                                کرنے سے اتفاق کرتا ہوں۔)</span></span>
+                    </label>
+
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="rule6" class="eligibility-check">
+                        <span class="checkbox-custom"></span>
+                        <span class="checkbox-text">I confirm that all the information provided in this application is
+                            accurate and can be verified if required. <span dir="rtl" class="urdu-text">(میں تصدیق کرتا
+                                ہوں کہ اس درخواست میں فراہم کردہ تمام معلومات درست ہیں اور ضرورت پڑنے پر ان کی تصدیق کی
+                                جا سکتی ہے۔)</span></span>
+                    </label>
+
+                    <div id="eligibilityMessage"
+                        style="display: none; color: var(--error-color); margin-top: 0.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.05); border-left: 4px solid var(--error-color); border-radius: 8px; font-weight: 500;">
+                        Sorry, you are not eligible to apply for this property. <span dir="rtl"
+                            class="urdu-text">(معذرت، آپ اس پراپرٹی کے لیے درخواست دینے کے اہل نہیں ہیں۔)</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">
+                    <span>Submit Application <span dir="rtl" class="urdu-text"
+                            style="display:inline; color: white;">(جمع کروائیں)</span></span>
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </button>
+            </div>
+        </form>
+
+        <!-- Success Screen -->
+        <div id="successScreen" class="glass-form hidden" style="text-align: center; padding: 4rem 2rem;">
+            <div style="font-size: 4rem; color: #10b981; margin-bottom: 1.5rem;">✓</div>
+            <h2 style="font-size: 2rem; color: var(--text-main); margin-bottom: 1rem; font-weight: 700;">Thank you for
+                submitting your application. <div dir="rtl" class="urdu-text"
+                    style="font-size: 0.7em; margin-top: 5px;">(آپ کی درخواست کا شکریہ)</div>
+            </h2>
+            <p style="font-size: 1.1rem; color: var(--text-muted); line-height: 1.6; max-width: 500px; margin: 0 auto;">
+                We have successfully received your information. We will review your details and contact you shortly
+                after verification.<br><br>We appreciate your interest.<br><br><span dir="rtl" class="urdu-text"
+                    style="font-size: 1.1rem; line-height: 1.8; color: var(--text-muted);">(آپ کی درخواست کامیابی سے
+                    موصول ہو گئی ہے۔ ہم آپ کی معلومات کی تصدیق کے بعد جلد ہی آپ سے رابطہ کریں گے۔)</span>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        function handleOccupationChange(value) {
+            // Hide all by default
+            toggleDetails('jobDetails', false);
+            toggleDetails('businessDetails', false);
+            toggleDetails('studentDetails', false);
+
+            // Show relevant based on selection
+            if (value === 'job') {
+                toggleDetails('jobDetails', true);
+            } else if (value === 'business') {
+                toggleDetails('businessDetails', true);
+            } else if (value === 'student') {
+                toggleDetails('studentDetails', true);
+            }
+        }
+
+        function toggleDetails(elementId, show) {
+            const el = document.getElementById(elementId);
+            if (show) {
+                el.classList.remove('hidden');
+                // Use a slight timeout to allow display block to apply before animating opacity if we wanted
+                setTimeout(() => el.style.opacity = 1, 10);
+            } else {
+                el.classList.add('hidden');
+                el.style.opacity = 0;
+            }
+        }
+
+        document.getElementById('tenantForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Check eligibility
+            const checkboxes = document.querySelectorAll('.eligibility-check');
+            let allChecked = true;
+            checkboxes.forEach(cb => {
+                if (!cb.checked) allChecked = false;
+            });
+
+            const errorMsg = document.getElementById('eligibilityMessage');
+            if (!allChecked) {
+                errorMsg.style.display = 'block';
+                return; // Stop submission
+            } else {
+                errorMsg.style.display = 'none';
+            }
+
+            const btn = document.querySelector('.submit-btn');
+            const originalText = btn.innerHTML;
+
+            // Loading state
+            btn.innerHTML = '<span>Submitting... <span dir=\"rtl\" class=\"urdu-text\" style=\"display:inline; color: white;\">(جمع ہو رہا ہے...)</span></span>';
+            btn.style.opacity = '0.7';
+            btn.disabled = true;
+
+            const formData = new FormData(this);
+
+            fetch('/submit', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                .then(({ status, body }) => {
+                    if (status === 200 && (body.status === 'success' || body.status === 'warning')) {
+                        btn.innerHTML = '<span>Application Sent! ✓ <span dir=\"rtl\" class=\"urdu-text\" style=\"display:inline; color: white;\">(درخواست موصول ہو گئی! ✓)</span></span>';
+                        btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                        btn.style.opacity = '1';
+
+                        setTimeout(() => {
+                            // Hide the form and header, show success screen
+                            document.querySelector('.form-header').style.display = 'none';
+                            this.style.display = 'none';
+
+                            const successScreen = document.getElementById('successScreen');
+                            successScreen.classList.remove('hidden');
+
+                            // Reset form in the background
+                            btn.innerHTML = originalText;
+                            btn.style.background = '';
+                            btn.disabled = false;
+                            this.reset();
+                            toggleDetails('petDetailsWrapper', false);
+                            toggleDetails('rentalHistoryDetails', false);
+                            toggleDetails('jobDetails', false);
+                            toggleDetails('businessDetails', false);
+                            toggleDetails('studentDetails', false);
+                            toggleDetails('studentIncomeDetails', false);
+                            removeImage();
+                        }, 800);
+                    } else {
+                        throw new Error(body.detail || "Submission failed");
+                    }
+                })
+                .catch(error => {
+                    alert("Error submitting form: " + error.message);
+                    btn.innerHTML = originalText;
+                    btn.style.opacity = '1';
+                    btn.disabled = false;
+                });
+        });
+
+        // Add file upload UI interaction
+        const fileInput = document.getElementById('cnic');
+        const uploadUI = document.getElementById('uploadUI');
+        const uploadText = document.querySelector('.upload-text');
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const cnicPreview = document.getElementById('cnicPreview');
+
+        fileInput.addEventListener('change', function (e) {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    cnicPreview.src = event.target.result;
+                    uploadUI.classList.add('hidden');
+                    imagePreviewContainer.classList.remove('hidden');
+                };
+                reader.readAsDataURL(this.files[0]);
+            } else {
+                removeImage();
+            }
+        });
+
+        function removeImage() {
+            fileInput.value = ""; // Clear the file input
+            uploadUI.classList.remove('hidden');
+            imagePreviewContainer.classList.add('hidden');
+            cnicPreview.src = "";
+            uploadUI.style.borderColor = 'var(--border-color)';
+            uploadUI.style.background = 'transparent';
+        }
+    </script>
+</body>
+
+</html>
