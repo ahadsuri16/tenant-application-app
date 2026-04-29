@@ -41,10 +41,28 @@
                         <input type="tel" id="phone" name="phone" placeholder="+92 300 0000000" required>
                     </div>
                     <div class="form-group full-width">
-                        <label for="cnic">Upload CNIC Picture <span dir="rtl" class="urdu-text">(شناختی کارڈ کی تصویر اپ
-                                لوڈ کریں)</span></label>
+                        <!-- CNIC Consent Step -->
+                        <label>Are you comfortable uploading your CNIC? <span dir="rtl" class="urdu-text">(کیا آپ اپنا شناختی کارڈ اپ لوڈ کرنے میں آسانی محسوس کرتے ہیں؟)</span></label>
+                        <div class="radio-group" style="margin-top: 0.5rem;">
+                            <label class="radio-label">
+                                <input type="radio" name="cnicConsent" value="yes" onchange="toggleCnicUpload(true)">
+                                <span class="radio-custom"></span> Yes (ہاں)
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="cnicConsent" value="no" checked onchange="toggleCnicUpload(false)">
+                                <span class="radio-custom"></span> No (نہیں)
+                            </label>
+                        </div>
+                        <p style="margin-top: 0.6rem; font-size: 0.82rem; color: var(--text-muted); display: flex; align-items: center; gap: 0.4rem;">
+                            🔒 <span>Your information will remain completely confidential and secure. <span dir="rtl" class="urdu-text">(آپ کی معلومات مکمل طور پر خفیہ اور محفوظ رہے گی۔)</span></span>
+                        </p>
+                    </div>
+
+                    <!-- CNIC Upload Field (shown only when consent = Yes) -->
+                    <div class="form-group full-width hidden" id="cnicUploadWrapper">
+                        <label for="cnic">Upload CNIC Picture <span dir="rtl" class="urdu-text">(شناختی کارڈ کی تصویر اپ لوڈ کریں)</span></label>
                         <div class="file-upload-wrapper">
-                            <input type="file" id="cnic" name="cnic" accept="image/*" required>
+                            <input type="file" id="cnic" name="cnic" accept="image/*">
                             <div class="file-upload-ui" id="uploadUI">
                                 <span class="upload-icon">📄</span>
                                 <span class="upload-text">Select and upload your cnic front image here <span dir="rtl"
@@ -71,6 +89,7 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="form-group full-width">
                         <label for="address">Permanent Address <span dir="rtl" class="urdu-text">(مستقل
                                 پتہ)</span></label>
@@ -393,6 +412,19 @@
                 toggleDetails('businessDetails', true);
             } else if (value === 'student') {
                 toggleDetails('studentDetails', true);
+            }
+        }
+
+        function toggleCnicUpload(show) {
+            const wrapper = document.getElementById('cnicUploadWrapper');
+            if (show) {
+                wrapper.classList.remove('hidden');
+                setTimeout(() => wrapper.style.opacity = 1, 10);
+            } else {
+                wrapper.classList.add('hidden');
+                wrapper.style.opacity = 0;
+                // Clear the file input and preview when hiding
+                removeImage();
             }
         }
 
