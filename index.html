@@ -47,17 +47,25 @@
                             <input type="file" id="cnic" name="cnic" accept="image/*" required>
                             <div class="file-upload-ui" id="uploadUI">
                                 <span class="upload-icon">📄</span>
-                                <span class="upload-text">Select and upload your cnic front image here <span dir="rtl" class="urdu-text">(اپنے شناختی کارڈ کے سامنے کی تصویر یہاں منتخب کر کے اپ لوڈ کریں)</span></span>
+                                <span class="upload-text">Select and upload your cnic front image here <span dir="rtl"
+                                        class="urdu-text">(اپنے شناختی کارڈ کے سامنے کی تصویر یہاں منتخب کر کے اپ لوڈ
+                                        کریں)</span></span>
                             </div>
                             <!-- Image Preview Container -->
-                            <div id="imagePreviewContainer" class="hidden" style="margin-top: 1rem; text-align: center; background: rgba(255, 255, 255, 0.4); border-radius: 8px; padding: 1rem;">
-                                <img id="cnicPreview" src="" alt="CNIC Preview" style="max-width: 100%; max-height: 250px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
+                            <div id="imagePreviewContainer" class="hidden"
+                                style="margin-top: 1rem; text-align: center; background: rgba(255, 255, 255, 0.4); border-radius: 8px; padding: 1rem;">
+                                <img id="cnicPreview" src="" alt="CNIC Preview"
+                                    style="max-width: 100%; max-height: 250px; border-radius: 6px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 1rem;">
                                 <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                                    <button type="button" onclick="document.getElementById('cnic').click()" style="background: var(--primary-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
-                                        Replace Image <span dir="rtl" class="urdu-text" style="display:inline; color: white;">(تبدیل کریں)</span>
+                                    <button type="button" onclick="document.getElementById('cnic').click()"
+                                        style="background: var(--primary-color); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
+                                        Replace Image <span dir="rtl" class="urdu-text"
+                                            style="display:inline; color: white;">(تبدیل کریں)</span>
                                     </button>
-                                    <button type="button" onclick="removeImage()" style="background: #ef4444; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
-                                        Remove Image <span dir="rtl" class="urdu-text" style="display:inline; color: white;">(ہٹا دیں)</span>
+                                    <button type="button" onclick="removeImage()"
+                                        style="background: #ef4444; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer; font-family: inherit; font-weight: 500;">
+                                        Remove Image <span dir="rtl" class="urdu-text"
+                                            style="display:inline; color: white;">(ہٹا دیں)</span>
                                     </button>
                                 </div>
                             </div>
@@ -119,7 +127,6 @@
                             <option value="job">Job / Salaried (نوکری / تنخواہ دار)</option>
                             <option value="business">Business / Self-Employed (کاروبار / ذاتی روزگار)</option>
                             <option value="student">Student (طالب علم)</option>
-                            <option value="other">Other (دیگر)</option>
                         </select>
                     </div>
 
@@ -221,7 +228,7 @@
                     <div class="form-group">
                         <label for="rentRange">Preferred Rent Range (Optional) <span dir="rtl" class="urdu-text">(کرائے
                                 کی ترجیحی حد (اختیاری))</span></label>
-                        <input type="text" id="rentRange" name="rentRange" placeholder="e.g. 46,000 - 50,000">
+                        <input type="text" id="rentRange" name="rentRange" placeholder="e.g. 48,000 - 52,000">
                     </div>
                     <div class="form-group">
                         <label>Can you pay security deposit? <span dir="rtl" class="urdu-text">(کیا آپ سیکیورٹی ڈپازٹ
@@ -437,44 +444,44 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(jsonData)
                 })
-                .then(response => response.json().then(data => ({ status: response.status, body: data })))
-                .then(({ status, body }) => {
-                    if (status === 200 && (body.status === 'success' || body.status === 'warning')) {
-                        btn.innerHTML = '<span>Application Sent! ✓ <span dir=\"rtl\" class=\"urdu-text\" style=\"display:inline; color: white;\">(درخواست موصول ہو گئی! ✓)</span></span>';
-                        btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                    .then(response => response.json().then(data => ({ status: response.status, body: data })))
+                    .then(({ status, body }) => {
+                        if (status === 200 && (body.status === 'success' || body.status === 'warning')) {
+                            btn.innerHTML = '<span>Application Sent! ✓ <span dir=\"rtl\" class=\"urdu-text\" style=\"display:inline; color: white;\">(درخواست موصول ہو گئی! ✓)</span></span>';
+                            btn.style.background = 'linear-gradient(135deg, #10b981 0%, #059669 100%)';
+                            btn.style.opacity = '1';
+
+                            setTimeout(() => {
+                                // Hide the form and header, show success screen
+                                document.querySelector('.form-header').style.display = 'none';
+                                this.style.display = 'none';
+
+                                const successScreen = document.getElementById('successScreen');
+                                successScreen.classList.remove('hidden');
+
+                                // Reset form in the background
+                                btn.innerHTML = originalText;
+                                btn.style.background = '';
+                                btn.disabled = false;
+                                this.reset();
+                                toggleDetails('petDetailsWrapper', false);
+                                toggleDetails('rentalHistoryDetails', false);
+                                toggleDetails('jobDetails', false);
+                                toggleDetails('businessDetails', false);
+                                toggleDetails('studentDetails', false);
+                                toggleDetails('studentIncomeDetails', false);
+                                removeImage();
+                            }, 800);
+                        } else {
+                            throw new Error(body.detail || "Submission failed");
+                        }
+                    })
+                    .catch(error => {
+                        alert("Error submitting form: " + error.message);
+                        btn.innerHTML = originalText;
                         btn.style.opacity = '1';
-
-                        setTimeout(() => {
-                            // Hide the form and header, show success screen
-                            document.querySelector('.form-header').style.display = 'none';
-                            this.style.display = 'none';
-
-                            const successScreen = document.getElementById('successScreen');
-                            successScreen.classList.remove('hidden');
-
-                            // Reset form in the background
-                            btn.innerHTML = originalText;
-                            btn.style.background = '';
-                            btn.disabled = false;
-                            this.reset();
-                            toggleDetails('petDetailsWrapper', false);
-                            toggleDetails('rentalHistoryDetails', false);
-                            toggleDetails('jobDetails', false);
-                            toggleDetails('businessDetails', false);
-                            toggleDetails('studentDetails', false);
-                            toggleDetails('studentIncomeDetails', false);
-                            removeImage();
-                        }, 800);
-                    } else {
-                        throw new Error(body.detail || "Submission failed");
-                    }
-                })
-                .catch(error => {
-                    alert("Error submitting form: " + error.message);
-                    btn.innerHTML = originalText;
-                    btn.style.opacity = '1';
-                    btn.disabled = false;
-                });
+                        btn.disabled = false;
+                    });
             };
 
             // Process image to base64 if present
@@ -482,7 +489,7 @@
             if (fileInput.files.length > 0) {
                 const file = fileInput.files[0];
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     dataObj.cnic_base64 = event.target.result;
                     dataObj.cnic_filename = file.name;
                     sendJsonData(dataObj);
@@ -503,7 +510,7 @@
         fileInput.addEventListener('change', function (e) {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     cnicPreview.src = event.target.result;
                     uploadUI.classList.add('hidden');
                     imagePreviewContainer.classList.remove('hidden');
